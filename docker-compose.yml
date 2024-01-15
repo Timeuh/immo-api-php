@@ -1,0 +1,46 @@
+version: '3.8'
+
+networks:
+  immo-api-php.net:
+    driver: bridge
+
+name: immo-api-php
+
+services:
+
+  # service
+  #
+  immo-php:
+    image: 'canals/php:8.2'
+    env_file: .env
+    ports:
+      - '2080:80'
+    volumes:
+      - ./public:/var/www/html
+      - ./:/var/www
+    working_dir: /var/www/
+    networks:
+      immo-api-php.net:
+        aliases:
+          - immo-php.local
+    depends_on:
+      - immo-db
+
+  immo-db:
+    image: 'mysql:latest'
+    env_file: .env
+    ports:
+      - '5432:3306'
+    networks:
+      - immo-api-php.net
+    volumes:
+      - ./db-data:/var/sql'
+  #
+  # service administration des bases sql
+  #
+  adminer:
+    image: adminer
+    ports:
+      - '8080:8080'
+    networks:
+      - immo-api-php.net
